@@ -9,7 +9,7 @@ Este projeto apresenta uma ferramenta visual e interativa para explorar e resolv
 
 Desenvolvido para fins acadêmicos, este software oferece uma interface gráfica moderna e funcionalidades didáticas para facilitar a compreensão de conceitos complexos de algoritmos e inteligência artificial.
 
-[Vídeo de demonstração do projeto](https://github.com/Luiz-Przygoda/Genetic-knight-tour/blob/main/imgs/video-demo)
+[Vídeo de demonstração do projeto](https://github.com/Luiz-Przygoda/Genetic-knight-tour/blob/main/imgs/video-demo.webm)
 
 ---
 
