@@ -13,19 +13,20 @@ Desenvolvido para fins acadêmicos, este software oferece uma interface gráfica
 
 ## Sobre o Projeto
 
-O Passeio do Cavalo é um problema matemático que consiste em encontrar um caminho para uma peça de cavalo em um tabuleiro de xadrez, de forma que ela visite cada casa exatamente uma vez. Este é um exemplo clássico de um problema de busca de caminho hamiltoniano, conhecido por sua complexidade combinatória.
+O projeto aborda o problema do Passeio do Cavalo, que busca um caminho onde o cavalo visite todas as casas do tabuleiro uma única vez. Um caso clássico de caminho hamiltoniano.
+São exploradas três abordagens:
 
-Este projeto explora três métodos distintos para resolver o problema:
+1. **Warnsdorff:** heurística gulosa que prioriza casas com menos movimentos futuros, rápida mas sem garantia de solução;
 
-1.  **Heurística de Warnsdorff:** Uma abordagem gulosa (greedy) e muito eficiente. A regra instrui o cavalo a se mover para a casa que tem o menor número de saídas válidas futuras, evitando que fique preso em cantos do tabuleiro. É extremamente rápido, mas não garante uma solução em todos os casos.
-2.  **Backtracking:** Um algoritmo de força bruta que testa exaustivamente todas as possibilidades de caminho. Embora garanta encontrar uma solução se ela existir, seu custo computacional é muito alto, tornando-o inviável para tabuleiros maiores ou em tempo real.
-3.  **Algoritmo Genético (GA):** A abordagem central deste trabalho. O GA é uma meta-heurística inspirada no processo de seleção natural de Darwin. Ele trabalha com uma "população" de soluções candidatas (passeios) que evoluem ao longo de gerações através de operadores genéticos como seleção, cruzamento (crossover) e mutação, convergindo para uma solução ótima ou próxima da ótima.
+2. **Backtracking:** método exaustivo que sempre encontra solução, porém com alto custo computacional;
 
-A interface gráfica foi projetada para ser uma ferramenta de ensino, permitindo ao usuário visualizar, controlar e comparar o desempenho desses algoritmos em tempo real.
+3. **Algoritmo Genético:** foco principal do projeto, inspirado na seleção natural, evolui uma população de soluções por meio de seleção, cruzamento e mutação até atingir resultados ótimos ou próximos do ótimo.
+
+A interface gráfica interativa permite visualizar e comparar o desempenho dos algoritmos em tempo real, com foco didático e experimental.
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
 O projeto implementa três métodos para resolver o Passeio do Cavalo — Warnsdorff, Backtracking e Algoritmo Genético — em uma interface moderna e interativa feita com Tkinter e o tema sv-ttk.
 O sistema inclui:
@@ -91,9 +92,7 @@ A implementação dos algoritmos neste trabalho foi baseada em metodologias e an
 
 ---
 
-## 👨‍💻 Autores
-
-* Luiz Gustavo Przygoda
-* Marco Antônio Borghetti
-* Maria Isabel Wirth Marafon
-* Vinicius Andrei Wille
+## **Colaboradores**
+| [<img src="https://avatars.githubusercontent.com/u/142179999?v=4" width="115">](https://github.com/Luiz-Przygoda) | [<img src="https://avatars.githubusercontent.com/u/113839563?v=4" width="115">](https://github.com/Wyllye) | [<img src="https://avatars.githubusercontent.com/u/125486974?v=4" width="115">](https://github.com/mariaglx) | [<img src="https://avatars.githubusercontent.com/u/75136675?v=4" width="115">](https://github.com/marcobgh)|
+|:--------------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:--------------------------------------------------------------------:|
+| **Luiz-Przygoda**                                                              | **Wyllye**                                                               | **Mariaglx**                                                           | **Marcobgh**                                                              |
