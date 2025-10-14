@@ -1,4 +1,9 @@
-# ♞ Passeio do Cavalo: Uma Análise Comparativa com Algoritmo Genético
+# Passeio do Cavalo: Uma Análise Comparativa com Algoritmo Genético
+---
+![Logo do projeto](https://github.com/Luiz-Przygoda/Genetic-knight-tour/blob/main/imgs/knights%20tour%20logo.png)
+Uma Análise Comparativa com Algoritmo Genético fundamentada em Python.
+
+## Introdução
 
 Este projeto apresenta uma ferramenta visual e interativa para explorar e resolver o clássico problema do **Passeio do Cavalo**. A aplicação não apenas encontra soluções, mas também serve como uma plataforma de demonstração para comparar diferentes abordagens algorítmicas, com foco especial em uma implementação robusta de **Algoritmo Genético**.
 
@@ -22,15 +27,19 @@ A interface gráfica foi projetada para ser uma ferramenta de ensino, permitindo
 
 ## ✨ Funcionalidades Principais
 
-* **Três Abordagens de Resolução:** Implementação completa dos algoritmos de Warnsdorff, Backtracking e Genético.
-* **Interface Gráfica Moderna e Interativa:** Desenvolvida com `Tkinter` e um tema moderno (`sv-ttk`) para uma experiência de usuário agradável e profissional.
-* **Tabuleiro Dinâmico e Tela Cheia:** O programa inicia em tela cheia e o tabuleiro se redimensiona automaticamente para preencher o espaço disponível.
-* **Animação Detalhada com Controles:** Visualize o caminho sendo construído passo a passo por qualquer um dos algoritmos, com um botão dedicado para **pausar e continuar** a animação.
-* **Controle Total sobre o Algoritmo Genético:** Inicie, **pause e continue** o processo de evolução do GA a qualquer momento, observando os resultados parciais.
-* **Gráfico de Evolução em Tempo Real:** Um gráfico `matplotlib` integrado mostra a convergência do Algoritmo Genético, plotando a melhor aptidão e a aptidão média da população a cada geração.
-* **Visualização Didática da Heurística de Warnsdorff:** Passe o mouse sobre o tabuleiro para ver em tempo real os "graus" de cada movimento possível, entendendo visualmente como a heurística funciona.
-* **Barra de Status Informativa:** Acompanhe o status do programa, geração atual, aptidão, tempo decorrido e outras informações importantes.
+O projeto implementa três métodos para resolver o Passeio do Cavalo — Warnsdorff, Backtracking e Algoritmo Genético — em uma interface moderna e interativa feita com Tkinter e o tema sv-ttk.
+O sistema inclui:
 
+* **Tabuleiro dinâmico em tela cheia**, com redimensionamento automático;
+
+* **Animação passo a passo** com opção de pausar e retomar;
+
+* **Controle total do Algoritmo Genético**, permitindo acompanhar sua evolução em tempo real por meio de um gráfico integrado (matplotlib);
+
+* **Visualização didática da heurística de Warnsdorff**, mostrando os graus de movimento ao passar o mouse;
+
+* **Barra de status informativa**, exibindo dados como geração, aptidão e tempo de execução.
+  
 ---
 
 ## 🛠️ Tecnologias Utilizadas
