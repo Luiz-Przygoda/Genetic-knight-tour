@@ -65,7 +65,7 @@ Siga os passos abaixo para executar o projeto em sua máquina local.
 
 1.  **Clone o repositório (ou baixe os arquivos):**
     ```bash
-    git clone [https://github.com/Luiz-Przygoda/Genetic-knight-tour]https://github.com/Luiz-Przygoda/Genetic-knight-tour)
+    git clone [https://github.com/Luiz-Przygoda/Genetic-knight-tour](https://github.com/Luiz-Przygoda/Genetic-knight-tour)
     cd seu-repositorio
     ```
 
