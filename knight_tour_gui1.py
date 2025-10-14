@@ -4,10 +4,11 @@ Versão definitiva para apresentação, com tema moderno, gráfico de evolução
 e visualização interativa da heurística de Warnsdorff.
 """
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog, messagebox
 import random
 import time
 from copy import deepcopy
+from tkinter import messagebox
 
 # Tente importar as bibliotecas adicionais e avise se faltarem
 try:
@@ -135,6 +136,41 @@ class GeneticKnightTour:
 # Classe Principal da GUI
 # ----------------------------
 class KnightTourGUI:
+    def save_ga_graph(self):
+        # Abre um diálogo para salvar a figura do GA como PNG/SVG/PDF.
+        if not MATPLOTLIB_AVAILABLE or not hasattr(self, "fig"):
+            messagebox.showerror("Erro", "Gráfico indisponível (matplotlib não carregado).")
+            return
+
+        # Sugestão de nome de arquivo com a geração atual
+        gen = getattr(self.ga, "generation", 0) if self.ga else 0
+        suggested = f"ga_convergencia_gen{gen}"
+
+        filepath = filedialog.asksaveasfilename(
+            title="Salvar gráfico",
+            defaultextension=".png",
+            initialfile=suggested,
+            filetypes=[
+                ("PNG", "*.png"),
+                ("SVG", "*.svg"),
+                ("PDF", "*.pdf"),
+                ("Todos os arquivos", "*.*"),
+            ],
+        )
+        if not filepath:
+            return  # usuário cancelou
+
+        try:
+            # Garante que tudo está desenhado antes de salvar
+            if hasattr(self, "graph_canvas"):
+                self.graph_canvas.draw()
+
+            # Salva com uma resolução boa e sem cortes
+            self.fig.savefig(filepath, dpi=150, bbox_inches="tight")
+            messagebox.showinfo("Sucesso", f"Gráfico salvo em:\n{filepath}")
+        except Exception as e:
+            messagebox.showerror("Erro ao salvar", f"Não foi possível salvar o gráfico.\n\nDetalhes: {e}")
+
     def __init__(self, root, n=BOARD_SIZE):
         self.root = root; self.n = n; self.cell_size = 60; self.start_idx = 0; self.path = []
         self.ga = None; self.ga_state = 'idle'; self.animation_state = 'idle'
@@ -169,6 +205,13 @@ class KnightTourGUI:
             graph_frame = ttk.LabelFrame(self.controls_frame, text="Evolução do GA", padding=10); graph_frame.pack(fill='both', expand=True, pady=10)
             self.fig = plt.Figure(figsize=(4, 3), dpi=100); self.ax_graph = self.fig.add_subplot(111)
             self.graph_canvas = FigureCanvasTkAgg(self.fig, master=graph_frame); self.graph_canvas.get_tk_widget().pack(fill='both', expand=True)
+            # Botão para salvar o gráfico como imagem
+            self.save_graph_btn = ttk.Button(
+                graph_frame,
+                text="Salvar gráfico (PNG/SVG/PDF)",
+                command=self.save_ga_graph
+            )
+            self.save_graph_btn.pack(fill='x', pady=(8, 0))
             self.init_ga_graph()
         else: ttk.Label(self.controls_frame, text="Matplotlib não encontrado.\nGráfico indisponível.", foreground="red").pack(pady=10)
 
