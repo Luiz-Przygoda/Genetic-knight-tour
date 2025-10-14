@@ -65,7 +65,7 @@ Siga os passos abaixo para executar o projeto em sua máquina local.
 
 1.  **Clone o repositório (ou baixe os arquivos):**
     ```bash
-    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+    git clone [https://github.com/Luiz-Przygoda/Genetic-knight-tour]https://github.com/Luiz-Przygoda/Genetic-knight-tour)
     cd seu-repositorio
     ```
 
@@ -76,9 +76,8 @@ Siga os passos abaixo para executar o projeto em sua máquina local.
 
 3.  **Execute o programa:**
     ```bash
-    python nome_do_seu_arquivo.py
+    python knight_tour_gui1.py
     ```
-    *(Substitua `nome_do_seu_arquivo.py` pelo nome do seu script principal, por exemplo, `knight_tour_gui_presentation_final.py`)*
 
 ---
 
