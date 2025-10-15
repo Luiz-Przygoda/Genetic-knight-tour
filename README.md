@@ -1,5 +1,4 @@
-# Passeio do Cavalo: Uma Análise Comparativa com Algoritmo Genético
----
+# O Problema do Passeio do Cavalo
 ![Logo do projeto](https://github.com/Luiz-Przygoda/Genetic-knight-tour/blob/main/imgs/knights%20tour%20logo.png)
 Uma Análise Comparativa com Algoritmo Genético fundamentada em Python.
 
@@ -26,8 +25,6 @@ São exploradas três abordagens:
 
 A interface gráfica interativa permite visualizar e comparar o desempenho dos algoritmos em tempo real, com foco didático e experimental.
 
----
-
 ## Funcionalidades Principais
 
 O projeto implementa três métodos para resolver o Passeio do Cavalo — Warnsdorff, Backtracking e Algoritmo Genético — em uma interface moderna e interativa feita com Tkinter e o tema sv-ttk.
@@ -43,18 +40,16 @@ O sistema inclui:
 
 * **Barra de status informativa**, exibindo dados como geração, aptidão e tempo de execução.
   
----
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 * **Python 3**
 * **Tkinter:** Para a construção da interface gráfica.
 * **Matplotlib:** Para a plotagem do gráfico de evolução do GA.
 * **sv-ttk:** Para aplicar o tema moderno "Sun Valley" à interface.
 
----
 
-## 🚀 Como Executar
+## Como Executar
 
 Siga os passos abaixo para executar o projeto em sua máquina local.
 
@@ -81,17 +76,6 @@ Siga os passos abaixo para executar o projeto em sua máquina local.
     python knight_tour_gui1.py
     ```
 
----
-
-## 🎓 Fundamentação Teórica
-
-A implementação dos algoritmos neste trabalho foi baseada em metodologias e análises encontradas na literatura acadêmica. As principais referências que guiaram o desenvolvimento foram:
-
-* **Para o Algoritmo Genético:**
-    * Herath, H. K. E. H. S. B., de Silva, C. V. S. S. S., & Bandara, P. M. R. M. (2012). **An efficient genetic algorithm for the knight's tour problem**. *2012 International Conference on Advances in ICT for Emerging Regions (ICTer)*.
-    * *Este artigo foi fundamental para a modelagem da solução, utilizando uma representação por permutação e operadores genéticos (crossover e mutação) adequados para o problema.*
-
----
 
 ## **Colaboradores**
 | [<img src="https://avatars.githubusercontent.com/u/142179999?v=4" width="115">](https://github.com/Luiz-Przygoda) | [<img src="https://avatars.githubusercontent.com/u/113839563?v=4" width="115">](https://github.com/Wyllye) | [<img src="https://avatars.githubusercontent.com/u/125486974?v=4" width="115">](https://github.com/mariaglx) | [<img src="https://avatars.githubusercontent.com/u/75136675?v=4" width="115">](https://github.com/marcobgh)|
