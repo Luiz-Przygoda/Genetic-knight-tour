@@ -22,7 +22,7 @@ except ImportError:
 # ----------------------------
 # Configurações Globais
 # ----------------------------
-BOARD_SIZE = 8
+BOARD_SIZE = 16
 GA_POP = 250
 GA_GEN_LIMIT = 2000
 GA_TOURN = 3
@@ -39,6 +39,58 @@ def xy_to_idx(x,y,n): return y * n + x
 def legal_knight_move(a,b,n):
     ax,ay = idx_to_xy(a,n); bx,by = idx_to_xy(b,n)
     return (abs(ax-bx), abs(ay-by)) in [(1,2),(2,1)]
+def random_knight_walk(n, start_idx=0):
+    """Gera um passeio aleatório de cavalo sem repetir casas (pode não cobrir o tabuleiro todo)."""
+    seen = set([start_idx])
+    path = [start_idx]
+    x, y = idx_to_xy(start_idx, n)
+    while True:
+        moves = []
+        for dx, dy in KNIGHT_MOVES:
+            nx, ny = x + dx, y + dy
+            if inbound(nx, ny, n):
+                idx = xy_to_idx(nx, ny, n)
+                if idx not in seen:
+                    moves.append(idx)
+        if not moves:
+            break
+        nxt = random.choice(moves)
+        path.append(nxt)
+        seen.add(nxt)
+        x, y = idx_to_xy(nxt, n)
+    return path  # pode ter < n*n
+def randomized_warnsdorff_extend(n, path):
+    """Tenta estender 'path' (lista de índices) sem repetir casas,
+    usando Warnsdorff com desempate aleatório."""
+    visited = set(path)
+    cur = path[-1]
+    while True:
+        x, y = idx_to_xy(cur, n)
+        candidates = []
+        for dx, dy in KNIGHT_MOVES:
+            nx, ny = x + dx, y + dy
+            if inbound(nx, ny, n):
+                idx = xy_to_idx(nx, ny, n)
+                if idx not in visited:
+                    # grau de liberdade do próximo passo
+                    deg = 0
+                    for dx2, dy2 in KNIGHT_MOVES:
+                        nnx, nny = nx + dx2, ny + dy2
+                        if inbound(nnx, nny, n):
+                            j = xy_to_idx(nnx, nny, n)
+                            if j not in visited:
+                                deg += 1
+                    candidates.append((deg, idx))
+        if not candidates:
+            break
+        # Warnsdorff: escolhe menor grau, porém aleatoriza entre empates
+        min_deg = min(d for d, _ in candidates)
+        pool = [idx for d, idx in candidates if d == min_deg]
+        nxt = random.choice(pool)
+        path.append(nxt)
+        visited.add(nxt)
+        cur = nxt
+    return path
 
 def warnsdorff_tour(n, start_idx=0):
     x0,y0 = idx_to_xy(start_idx,n); board = [[-1]*n for _ in range(n)]; path = []
@@ -85,52 +137,194 @@ def backtracking_tour(n, start_idx=0, time_limit=5.0):
 
 class GeneticKnightTour:
     def __init__(self, n, population_size, mutation_rate, tourn_size):
-        self.n = n; self.pop_size = population_size; self.mutation_rate = mutation_rate; self.tourn = tourn_size
-        self.population = []; self.fitnesses = []; self.generation = 0; self.best = None; self.best_fitness = -1
-        self.best_fitness_history = []; self.avg_fitness_history = []
+        self.n = n
+        self.pop_size = population_size
+        self.mutation_rate = mutation_rate
+        self.tourn = tourn_size
+        self.population = []
+        self.fitnesses = []
+        self.generation = 0
+        self.best = None               # melhor cromossomo (perm)
+        self.best_fitness = -1         # tamanho do prefixo legal - 1 (número de arestas legais)
+        self.best_path = None          # caminho 100% legal correspondente a 'best'
+        self.best_fitness_history = []
+        self.avg_fitness_history = []
 
+    # ---------- Construção e reparo ----------
     def init_population(self, start_idx=0):
-        self.generation = 0; self.best_fitness = -1; base = list(range(self.n*self.n)); base.remove(start_idx); self.population = []
-        self.best_fitness_history = []; self.avg_fitness_history = []
+        self.generation = 0
+        self.best_fitness = -1
+        self.best_path = None
+        self.best_fitness_history = []
+        self.avg_fitness_history = []
+        self.population = []
+
+        # Em vez de permutações puras, inicialize com passeios de cavalo aleatórios e complete com casas faltantes
+        all_cells = set(range(self.n * self.n))
         for _ in range(self.pop_size):
-            random.shuffle(base); chrom = [start_idx] + base; self.population.append(chrom)
+            walk = random_knight_walk(self.n, start_idx=start_idx)
+            remaining = list(all_cells - set(walk))
+            random.shuffle(remaining)
+            chrom = walk + remaining
+            self.repair(chrom)  # já sai "legalizado"
+            self.population.append(chrom)
+
         self.evaluate_all()
 
-    def fitness(self, chrom):
-        legal_moves = 0
-        for i in range(len(chrom) - 1):
-            if legal_knight_move(chrom[i], chrom[i+1], self.n): legal_moves += 1
-        return legal_moves
+    def _legal_prefix(self, chrom):
+        """Retorna o maior prefixo SEM repetir casas e só com movimentos válidos de cavalo.
+           Também retorna a versão 'ajustada' do cromossomo (com swaps locais)."""
+        n2 = self.n * self.n
+        visited = set([chrom[0]])
+        path = [chrom[0]]
+        chrom_adj = chrom[:]  # trabalhamos numa cópia
 
+        for i in range(1, n2):
+            prev = path[-1]
+            cur = chrom_adj[i]
+
+            # se já foi visitado ou o movimento não é legal, tentar achar gene mais à frente alcançável
+            if (cur in visited) or (not legal_knight_move(prev, cur, self.n)):
+                found = False
+                for j in range(i + 1, n2):
+                    cand = chrom_adj[j]
+                    if cand not in visited and legal_knight_move(prev, cand, self.n):
+                        # colocar candidato na posição i
+                        chrom_adj[i], chrom_adj[j] = chrom_adj[j], chrom_adj[i]
+                        cur = chrom_adj[i]
+                        found = True
+                        break
+                if not found:
+                    # não dá para seguir legalmente
+                    break
+
+            # agora cur é novo e alcançável
+            visited.add(cur)
+            path.append(cur)
+
+        return path, chrom_adj
+
+    def repair(self, chrom):
+        """Repara um cromossomo para maximizar o prefixo legal via swaps locais.
+           O cromossomo original é modificado in-place."""
+        path, fixed = self._legal_prefix(chrom)
+        chrom[:] = fixed  # sobrescreve com a versão reparada
+        return path
+
+    # ---------- Avaliação ----------
+    def fitness(self, chrom):
+        # 1) obtém prefixo legal (e o cromossomo ajustado)
+        base_path, _ = self._legal_prefix(chrom)
+        # 2) estende localmente com Warnsdorff aleatório (memético leve)
+        extended = randomized_warnsdorff_extend(self.n, base_path[:])
+        # fitness = arestas legais do caminho estendido
+        return max(0, len(extended) - 1), extended
+ 
     def evaluate_all(self):
-        self.fitnesses = [self.fitness(ch) for ch in self.population]
-        current_gen_best_fitness = max(self.fitnesses)
-        if current_gen_best_fitness > self.best_fitness:
-            self.best_fitness = current_gen_best_fitness; idx = self.fitnesses.index(self.best_fitness); self.best = deepcopy(self.population[idx])
+        fits = []
+        paths = []
+        for ch in self.population:
+            f, p = self.fitness(ch)
+            fits.append(f)
+            paths.append(p)
+
+        self.fitnesses = fits
+        current_gen_best = max(range(self.pop_size), key=lambda i: self.fitnesses[i])
+        current_best_fit = self.fitnesses[current_gen_best]
+
+        if current_best_fit > self.best_fitness:
+            self.best_fitness = current_best_fit
+            self.best = self.population[current_gen_best][:]
+            self.best_path = paths[current_gen_best][:]
+
         self.best_fitness_history.append(self.best_fitness)
         self.avg_fitness_history.append(sum(self.fitnesses) / self.pop_size)
 
+    # ---------- Seleção, Crossover, Mutação ----------
     def tournament_select(self):
-        k = self.tourn; candidates = random.sample(range(self.pop_size), k); best_idx = max(candidates, key=lambda i: self.fitnesses[i]); return deepcopy(self.population[best_idx])
+        k = self.tourn
+        candidates = random.sample(range(self.pop_size), k)
+        best_idx = max(candidates, key=lambda i: self.fitnesses[i])
+        return deepcopy(self.population[best_idx])
 
     def order_crossover(self, p1, p2):
-        n=len(p1); a,b = sorted(random.sample(range(n),2)); child = [-1]*n; child[a:b+1] = p1[a:b+1]; fill_pos = (b+1)%n
-        for gene in p2[b+1:]+p2[:b+1]:
-            if gene not in child: child[fill_pos] = gene; fill_pos = (fill_pos+1)%n
+        n = len(p1)
+        a, b = sorted(random.sample(range(n), 2))
+        child = [-1] * n
+        child[a:b+1] = p1[a:b+1]
+        fill_pos = (b + 1) % n
+        for gene in p2[b+1:] + p2[:b+1]:
+            if gene not in child:
+                child[fill_pos] = gene
+                fill_pos = (fill_pos + 1) % n
         return child
 
     def mutate(self, chrom):
-        if random.random() < 0.5: i,j = random.sample(range(1, len(chrom)),2); chrom[i],chrom[j] = chrom[j],chrom[i]
-        else: a,b = sorted(random.sample(range(1, len(chrom)),2)); chrom[a:b+1] = reversed(chrom[a:b+1])
+        if random.random() < 0.5:
+            i, j = random.sample(range(1, len(chrom)), 2)
+            chrom[i], chrom[j] = chrom[j], chrom[i]
+        else:
+            a, b = sorted(random.sample(range(1, len(chrom)), 2))
+            chrom[a:b+1] = reversed(chrom[a:b+1])
 
+    # ---------- Loop ----------
     def step(self):
-        newpop = [deepcopy(self.best)]
+        newpop = [deepcopy(self.best)]  # elitismo (já está reparado)
         while len(newpop) < self.pop_size:
-            p1 = self.tournament_select(); p2 = self.tournament_select(); child = self.order_crossover(p1,p2)
-            if random.random() < self.mutation_rate: self.mutate(child)
+            p1 = self.tournament_select()
+            p2 = self.tournament_select()
+            child = self.edge_recombination_crossover(p1, p2)
+            if random.random() < self.mutation_rate:
+                self.mutate(child)
+            # Repara o filho antes de entrar na população
+            self.repair(child)
             newpop.append(child)
-        self.population = newpop; self.evaluate_all(); self.generation += 1
-        return self.best_fitness == (self.n*self.n) - 1
+
+        self.population = newpop
+        self.evaluate_all()
+        self.generation += 1
+
+        # solução perfeita quando prefixo legal cobre todo o tabuleiro
+        return self.best_fitness == (self.n * self.n) - 1
+    
+    def edge_recombination_crossover(self, p1, p2):
+        """ERX: constrói um filho preservando adjacências dos pais."""
+        n = len(p1)
+        # tabela de adjacências
+        adj = {g: set() for g in p1}
+        def add_edges(a, b):
+            for i in range(n):
+                left = a[(i - 1) % n]
+                right = a[(i + 1) % n]
+                adj[a[i]].update([left, right])
+            for i in range(n):
+                left = b[(i - 1) % n]
+                right = b[(i + 1) % n]
+                adj[b[i]].update([left, right])
+
+        add_edges(p1, p2)
+
+        child = []
+        used = set()
+        cur = p1[0]  # pode variar; simples: começa no primeiro de p1
+        for _ in range(n):
+            child.append(cur)
+            used.add(cur)
+            # remove 'cur' das listas adjacentes
+            for k in adj:
+                adj[k].discard(cur)
+            # escolhe próximo:
+            # 1) entre adjacentes de cur, pegue aquele cujo set adjacente é menor (mais restrito)
+            candidates = [x for x in adj[cur] if x not in used]
+            if candidates:
+                cur = min(candidates, key=lambda x: len(adj[x]))
+            else:
+                # 2) se não há adjacente disponível, escolha qualquer gene ainda não usado
+                remaining = [g for g in adj.keys() if g not in used]
+                if not remaining:
+                    break
+                cur = random.choice(remaining)
+        return child
 
 # ----------------------------
 # Classe Principal da GUI
@@ -350,7 +544,9 @@ class KnightTourGUI:
         if self.ga_state != 'running':
             if self.ga_state == 'idle': self._toggle_controls(tk.NORMAL); self.run_ga_btn.config(text="Iniciar GA")
             return
-        solution_found = self.ga.step(); self.path = self.ga.best; self.redraw_canvas()
+        solution_found = self.ga.step()
+        self.path = self.ga.best_path[:] if self.ga.best_path else []
+        self.redraw_canvas()
         max_fitness = self.n*self.n-1; elapsed = time.time()-self.start_time
         self._update_status(gen=self.ga.generation, fitness=self.ga.best_fitness, total=max_fitness, elapsed=elapsed, message="GA em execução...", color="yellow")
         if MATPLOTLIB_AVAILABLE and (self.ga.generation % 5 == 0 or solution_found): self.update_ga_graph()
