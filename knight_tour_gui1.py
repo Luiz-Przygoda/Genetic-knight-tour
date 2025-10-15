@@ -22,7 +22,7 @@ except ImportError:
 # ----------------------------
 # Configurações Globais
 # ----------------------------
-BOARD_SIZE = 16
+BOARD_SIZE = 8
 GA_POP = 250
 GA_GEN_LIMIT = 2000
 GA_TOURN = 3
