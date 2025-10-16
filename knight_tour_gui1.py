@@ -10,7 +10,6 @@ import time
 from copy import deepcopy
 from tkinter import messagebox
 
-# Tente importar as bibliotecas adicionais e avise se faltarem
 try:
     import matplotlib.pyplot as plt
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -284,7 +283,7 @@ class GeneticKnightTour:
         self.evaluate_all()
         self.generation += 1
 
-        # solução perfeita quando prefixo legal cobre todo o tabuleiro
+    
         return self.best_fitness == (self.n * self.n) - 1
     
     def edge_recombination_crossover(self, p1, p2):
@@ -592,4 +591,5 @@ if __name__ == "__main__":
 
     root.state('zoomed')
     app = KnightTourGUI(root, n=BOARD_SIZE)
+
     root.mainloop()
